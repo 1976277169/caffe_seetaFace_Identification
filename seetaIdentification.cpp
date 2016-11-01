@@ -1,5 +1,5 @@
 #include <caffe/caffe.hpp>
-#include <opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include <algorithm>
 #include <iosfwd>
 #include <memory>
@@ -17,11 +17,11 @@ public:
 	void start(const char* deploy_path, const char* trained_model_path, const char* mean_image_path)
 	{
 		#ifdef CPU_ONLY
-		caffe::Caffe::set_mode(caffe::Caffe::CPU);
+		  caffe::Caffe::set_mode(caffe::Caffe::CPU);
 		#else
 		  caffe::Caffe::set_mode(caffe::Caffe::GPU);
 		#endif
-		
+	    //caffe::Caffe::set_mode(caffe::Caffe::GPU);	
 
 		net_.reset(new caffe::Net<float>(std::string(deploy_path), caffe::TEST));
 		net_->CopyTrainedLayersFromBinaryProto(std::string(trained_model_path));
@@ -193,34 +193,48 @@ private:
 	}
 
 	std::vector<float> mean_image_;
-	std::shared_ptr<caffe::Net<float> > net_;
+	boost::shared_ptr<caffe::Net<float> > net_;
 };
 
-void extractFeature_demo(const char* deploy_path, const char* trained_model_path, const char* mean_image_path)
+void extractFeature_demo(const char* deploy_path, const char* trained_model_path, const char* mean_image_path, const char* image_path)
 {
 	SeetaFaceIdentification seetaFace;
 	seetaFace.start(deploy_path, trained_model_path, mean_image_path);
 
-	cv::Mat image = cv::imread("E:/CODE/caffe-app/caffe-app/NF_200001_001.jpg");
+	cv::Mat image = cv::imread(image_path);
+        std::cout<<image_path<<std::endl;
 	if (image.empty())
+	{
 		std::cout << "Load image failed!\n";
-
+		return;		
+	}
 	/*
 	* @brief if your image wiht background, you shoud detect face first and then crop face
 	*/
-	
+	cv::imshow("face", image);
+	cv::waitKey(1);
 	seetaFace.setData(image);
 	std::vector<float> feature;
+
+    double accumulate_time = 0.0;
+    int  loop_count = 1; //bigger than 1 for test elapsed time
+    for(int i = 0; i < loop_count; ++i){
+	int64 start = cv::getTickCount();
 	seetaFace.execute(feature);
+	accumulate_time += (cv::getTickCount() - start) / cv::getTickFrequency();
+    }
+	std::cout<<"Elapsed time: "<< accumulate_time / loop_count <<" ms."<<std::endl;
 	std::copy(feature.begin(), feature.end(), std::ostream_iterator<float>(std::cout, "\t"));
+    std::cout<<std::endl;
 }
 
-void main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 	if (argc < 4)
 	{
-		std::cout<<"Usage: seetaIdentification <path to deploy> <path to caffemodel> <path to mean image>"<<std::endl;
-		return;
+		std::cout<<"Usage: seetaIdentification <path to deploy> <path to caffemodel> <path to mean image> <path to image>"<<std::endl;
+		return 0;
 	}
-	extractFeature_demo(std::string(argv[1]), std::string(argv[2]), std::string(argv[3]);
+	extractFeature_demo(argv[1], argv[2], argv[3], argv[4]);
+    return 1;
 }
