@@ -16,14 +16,12 @@ public:
 
 	void start(const char* deploy_path, const char* trained_model_path, const char* mean_image_path)
 	{
-		/*
 		#ifdef CPU_ONLY
 		caffe::Caffe::set_mode(caffe::Caffe::CPU);
 		#else
 		  caffe::Caffe::set_mode(caffe::Caffe::GPU);
 		#endif
-		*/
-		caffe::Caffe::set_mode(caffe::Caffe::CPU);
+		
 
 		net_.reset(new caffe::Net<float>(std::string(deploy_path), caffe::TEST));
 		net_->CopyTrainedLayersFromBinaryProto(std::string(trained_model_path));
