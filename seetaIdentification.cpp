@@ -223,7 +223,7 @@ void extractFeature_demo(const char* deploy_path, const char* trained_model_path
 	seetaFace.execute(feature);
 	accumulate_time += (cv::getTickCount() - start) / cv::getTickFrequency();
     }
-	std::cout<<"Elapsed time: "<< accumulate_time / loop_count <<" ms."<<std::endl;
+	std::cout<<"Elapsed time: "<< 1000*accumulate_time / loop_count <<" ms."<<std::endl;//If the unit is in milliseconds, it should be multiplied by 1000 
 	std::copy(feature.begin(), feature.end(), std::ostream_iterator<float>(std::cout, "\t"));
     std::cout<<std::endl;
 }
