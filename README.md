@@ -1,6 +1,6 @@
 # caffe_seetaFace_Identification
 
-[Transformed caffe model](https://pan.baidu.com/s/1dFoPESh)
+[Transformed caffe model](http://pan.baidu.com/s/1pL4Qsp9)
 
 ##Usage:  
 1, put 'seetaIdentification.cpp' int caffe_root/tools  
